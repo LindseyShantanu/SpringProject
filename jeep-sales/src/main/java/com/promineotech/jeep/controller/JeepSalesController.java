@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 
-@RequestMapping("/jeeps")
+@RequestMapping("/jeeps") //tells spring to map jeeps uri to the class BasicJSC 
 @OpenAPIDefinition(info = @Info(title = "Jeep Sales Service"), servers = {
     @Server(url = "http://localhost:8080", description = "Local server.")})
 public interface JeepSalesController {
@@ -57,7 +57,7 @@ public interface JeepSalesController {
       }
   )
 
-  @GetMapping()
+  @GetMapping() //maps to fetchJeeps method
   @ResponseStatus(code = HttpStatus.OK)
   List<Jeep> fetchJeepList(
       @RequestParam(required = false) 
