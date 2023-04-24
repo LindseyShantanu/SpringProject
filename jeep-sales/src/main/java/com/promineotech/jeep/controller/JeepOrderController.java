@@ -1,17 +1,15 @@
 package com.promineotech.jeep.controller;
 
-import java.util.List;
-import javax.validation.constraints.Pattern;
-import org.hibernate.validator.constraints.Length;
+
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import com.promineotech.jeep.Constants;
-import com.promineotech.jeep.entity.Jeep;
-import com.promineotech.jeep.entity.JeepModel;
+import com.promineotech.jeep.entity.Order;
+import com.promineotech.jeep.entity.OrderRequest;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,12 +19,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 
-
 @Validated
 @RequestMapping("/orders") //tells spring to map jeeps uri to the class BasicJSC 
 @OpenAPIDefinition(info = @Info(title = "Jeep Order Service"), servers = {
     @Server(url = "http://localhost:8080", description = "Local server.")})
-public interface JeepSalesController {
+public interface JeepOrderController {
 
   //@formatter:off
   @Operation(
@@ -37,14 +34,14 @@ public interface JeepSalesController {
               responseCode = "200", 
               description = "The created Jeep is returned", 
               content = @Content(mediaType = "application/json", 
-                  schema = @Schema(implementation = Jeep.class))),
+                  schema = @Schema(implementation = Order.class))),
           @ApiResponse(
               responseCode = "400", 
               description = "The request parameters are invalid",
               content = @Content(mediaType = "application/json")),
           @ApiResponse(
               responseCode = "404", 
-              description = "No Jeeps were found with the input criteria",
+              description = "A Jeep component was not found with the input criteria",
               content = @Content(mediaType = "application/json")),
           @ApiResponse(
               responseCode = "500", 
@@ -53,26 +50,13 @@ public interface JeepSalesController {
       },
       parameters = {
           @Parameter(
-              name = "model", 
-              allowEmptyValue = false, 
-              required = false, 
-              description = "The model name(i.e. 'WRANGLER')"),
-          @Parameter(
-              name = "trim", 
-              allowEmptyValue = false, 
-              required = false, 
-              description = "The trim name (i.e. 'Sport')")
+              name = "orderRequest", 
+              required = true, 
+              description = "The order as JSON"),
       }
   )
 
-  @GetMapping() //maps to fetchJeeps method
-  @ResponseStatus(code = HttpStatus.OK)
-  List<Jeep> fetchJeepList(
-      @RequestParam(required = false) 
-        JeepModel model,
-      @Length(max = Constants.TRIM_MAX_LENGTH)
-      @Pattern(regexp = "[\\w\\s]*")
-      @RequestParam(required = false) 
-        String trim);
-  // @formatter:on
+  @PostMapping() //maps to fetchJeeps method
+  @ResponseStatus(code = HttpStatus.CREATED)
+  Order createOrder(@Valid @RequestBody OrderRequest orderRequest);
 }
